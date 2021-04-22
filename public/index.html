@@ -1,14 +1,65 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id"
+        content="9699423633-4uu2884lebu3dm1cktktui2ck022mnda.apps.googleusercontent.com">
+
     <title>App RestServer</title>
     <link rel="stylesheet" href="./loader.css">
 </head>
+
 <body>
     <h1>API REST SERVER</h1>
-    <div class="lds-ripple"><div></div><div></div></div>
+    <div class="lds-ripple">
+        <div></div>
+        <div></div>
+    </div>
+    <h2>Google SigIn</h2>
+    <hr>
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    <a href="#" onclick="signOut();">Sign out</a>
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script>
+        var url = (window.location.hostname === 'localhost')
+            ? ('http://localhost:8080/api/auth/google')
+            : ('https://rest-api11.herokuapp.com/api/auth/google')
+
+        function onSignIn(googleUser) {
+            var profile = googleUser.getBasicProfile();
+            console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+            console.log('Name: ' + profile.getName());
+            console.log('Image URL: ' + profile.getImageUrl());
+            console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+            var id_token = googleUser.getAuthResponse().id_token;
+            const data = { id_token }
+
+            fetch(url, { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => console.log(data))
+            .catch( console.error )
+
+
+        }
+
+        function signOut() {
+            var auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function () {
+                console.log('User signed out.');
+            });
+        }
+    </script>
 </body>
+
 </html>
